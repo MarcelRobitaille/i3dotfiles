@@ -13,9 +13,9 @@ while read -r line ; do
             clock=" ${line#?} "
             ;;
         D*)
-		    # date output
-			date="  ${line#?} "
-			;;
+            # date output
+            date="  ${line#?} "
+            ;;
         E*)
             # battery
             bat="   ${line#?} "
