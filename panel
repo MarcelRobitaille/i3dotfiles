@@ -1,0 +1,65 @@
+#!/bin/bash
+
+PANEL_FIFO=/tmp/panel-fifo
+PANEL_HEIGHT=28
+PANEL_FONT_FAMILY="CamingoCode:size=9"
+ICON_FONT="FontAwesome:size=11"
+ICON_FONT2="MaterialIcons:size=11"
+
+if [ $(pgrep -cx panel) -gt 1 ] ; then
+        printf "%s\n" "The panel is already running." >&2
+        exit 1
+fi
+
+trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
+
+[ -e "$PANEL_FIFO" ] && rm "$PANEL_FIFO"
+mkfifo "$PANEL_FIFO"
+
+
+#power button
+echo -e 'P\uf011' > $PANEL_FIFO &
+
+#clock
+while true; do
+    echo -e 'C\uE924' $(date +'%l:%M %p')
+    sleep 5 
+done > "$PANEL_FIFO" &
+
+#date
+while true; do
+    echo -e 'D\uE916' $(date +'%A, %b %e')
+    sleep 5
+done > "$PANEL_FIFO" &
+
+#battery
+while true; do
+    lvl=$(cat /sys/class/power_supply/BAT0/capacity)
+    stat=$(cat /sys/class/power_supply/BAT0/status)
+    if [ $stat == "Charging" ]
+    then
+        icon='\uE1A3'
+    elif (($lvl > 20))
+    then
+        icon='\uE1A4'
+    else
+        icon='\uE19C'
+    fi
+
+    echo -e 'E' $icon $(cat /sys/class/power_supply/BAT0/capacity) '%'
+    sleep 5
+done > "$PANEL_FIFO" &
+
+. panel_colors
+
+cat "$PANEL_FIFO" | ~/.config/panel/panel_bar | lemonbar\
+    -g x$PANEL_HEIGHT\
+    -f "$PANEL_FONT_FAMILY"\
+    -f "$ICON_FONT"\
+    -f "$ICON_FONT2"\
+    -F "$COLOR_FOREGROUND"\
+    -B "$COLOR_BACKGROUND"\
+    -u 2 | bash &
+
+wait
+
