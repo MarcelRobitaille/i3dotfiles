@@ -18,7 +18,7 @@ mkfifo "$PANEL_FIFO"
 
 
 #power button
-echo -e 'P\uf011' > $PANEL_FIFO &
+echo -e 'P\uE8AC' > $PANEL_FIFO &
 
 #clock
 while true; do
@@ -46,13 +46,30 @@ while true; do
         icon='\uE19C'
     fi
 
-    echo -e 'E' $icon $(cat /sys/class/power_supply/BAT0/capacity) '%'
+    echo -e 'E' $icon $lvl '%'
     sleep 5
 done > "$PANEL_FIFO" &
 
-. panel_colors
+#volume
+while true; do
+    vol=$(amixer get Master | grep % | sed -n 1p | awk -F '[' '{print $2}' | awk -F ']' '{print $1}' | sed s/%//) 
+    if [ $vol = 0 ]; then
+        icon='\uE04F'
+    elif [ $vol -lt 33 ]; then
+        icon='\uE04E'
+    elif [ $vol -lt 66 ]; then
+        icon='\uE04D'
+    else
+        icon='\uE050'
+    fi
 
-cat "$PANEL_FIFO" | ~/.config/panel/panel_bar | lemonbar\
+    echo -e 'G' $icon $vol'%'
+    sleep 5
+done > "$PANEL_FIFO" &
+
+source ~/.config/panel/panel_config
+
+cat "$PANEL_FIFO" | ~/.config/panel/panel_functions | lemonbar\
     -g x$PANEL_HEIGHT\
     -f "$PANEL_FONT_FAMILY"\
     -f "$ICON_FONT"\

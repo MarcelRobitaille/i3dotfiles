@@ -1,8 +1,7 @@
 #!/bin/bash
 #
 # Example panel for LemonBoy's bar
-
-. panel_colors
+source ~/.config/panel/panel_config
 
 num_mon=$(xrandr | grep connected | wc -l)
 
@@ -10,15 +9,19 @@ while read -r line ; do
 	case $line in
         C*)
             # clock output
-            clock=" ${line#?} "
+            clock="${line#?}"
             ;;
         D*)
             # date output
-            date="  ${line#?} "
+            date="${line#?}"
             ;;
         E*)
             # battery
-            bat="   ${line#?} "
+            bat="${line#?}"
+            ;;
+        G*)
+            # volume
+            vol="${line#?}"
             ;;
         P*)
             # power button
@@ -74,5 +77,5 @@ while read -r line ; do
 			done
 			;;
 	esac
-    printf "%s\n" "%{B${COLOR_HIGHLIGHT}}%{l} ${powe}%{B${COLOR_BACKGROUND}} %{c}center %{r} ${bat} %{B${COLOR_HIGHLIGHT}}${date}${clock}"
+    printf "%s\n" "%{B${COLOR_HIGHLIGHT}}%{l} ${powe}%{B${COLOR_BACKGROUND}} %{c}center %{r}${vol}${bat} %{B${COLOR_HIGHLIGHT}} ${date} ${clock} "
 done
