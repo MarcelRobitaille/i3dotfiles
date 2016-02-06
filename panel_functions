@@ -1,6 +1,5 @@
 #!/bin/bash
-#
-# Example panel for LemonBoy's bar
+
 source ~/.config/panel/panel_config
 
 num_mon=$(xrandr | grep connected | wc -l)
@@ -9,15 +8,19 @@ while read -r line ; do
 	case $line in
         C*)
             # clock output
-            clock="${line#?}"
+            clock=" ${line#?} "
             ;;
         D*)
             # date output
-            date="${line#?}"
+            date=" ${line#?}"
             ;;
         E*)
             # battery
             bat="${line#?}"
+            ;;
+        F*)
+            # Networking
+            net="${line#?} "
             ;;
         G*)
             # volume
@@ -25,7 +28,7 @@ while read -r line ; do
             ;;
         P*)
             # power button
-            powe="%{A:sudo poweroff:}%{A3:sudo systemctl reboot:}${line#?} %{A}%{A}"
+            powe=" %{A:xterm -fa 'Source Code Pro' -T floatme -e ~/power.sh -fa 'Source Code Pro' -fs 12:}${line#?} %{A}"
             ;;
         W*) 
 			# bspwm internal state
@@ -49,8 +52,8 @@ while read -r line ; do
 					      fi
 					      ;;
 					O*)
-					      # focused occupied desktop	
-                                              wm_infos="${wm_infos}%{F$COLOR_FOCUSED_OCCUPIED_FG}%{B$COLOR_FOCUSED_OCCUPIED_BG}%{U$COLOR_FOREGROUND}%{+u}  ${name}  %{-u}%{B-}%{F-}"
+					      # focused occupied desktop
+                          wm_infos="${wm_infos}%{F$COLOR_FOCUSED_OCCUPIED_FG}%{B$COLOR_FOCUSED_OCCUPIED_BG}%{U$COLOR_FOREGROUND}%{+u}  ${name}  %{-u}%{B-}%{F-}"
 					      ;;
 					F*)
 					      # focused free desktop
@@ -77,5 +80,5 @@ while read -r line ; do
 			done
 			;;
 	esac
-    printf "%s\n" "%{B${COLOR_HIGHLIGHT}}%{l} ${powe}%{B${COLOR_BACKGROUND}} %{c}center %{r}${vol}${bat} %{B${COLOR_HIGHLIGHT}} ${date} ${clock} "
+    printf "%s\n" "%{l}%{B${COLOR_HIGHLIGHT}}${powe}%{B-}%{c}center%{r}${vol}${bat}${net}%{B${COLOR_HIGHLIGHT}}${date}${clock}%{B-}"
 done

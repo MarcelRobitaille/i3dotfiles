@@ -3,12 +3,12 @@
 PANEL_FIFO=/tmp/panel-fifo
 PANEL_HEIGHT=28
 PANEL_FONT_FAMILY="CamingoCode:size=9"
-ICON_FONT="FontAwesome:size=11"
-ICON_FONT2="MaterialIcons:size=11"
+#ICON_FONT2="typicons:size=11"
+ICON_FONT="MaterialIcons:size=11"
 
 if [ $(pgrep -cx panel) -gt 1 ] ; then
-        printf "%s\n" "The panel is already running." >&2
-        exit 1
+    printf "%s\n" "The panel is already running." >&2
+    exit 1
 fi
 
 trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
@@ -17,23 +17,17 @@ trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
 mkfifo "$PANEL_FIFO"
 
 
-#power button
+# Power button
 echo -e 'P\uE8AC' > $PANEL_FIFO &
 
-#clock
 while true; do
-    echo -e 'C\uE924' $(date +'%l:%M %p')
-    sleep 5 
-done > "$PANEL_FIFO" &
+    # Clock
+    echo -e 'C\uE924' $(date +'%l:%M:%S %p')
 
-#date
-while true; do
+    # Date
     echo -e 'D\uE916' $(date +'%A, %b %e')
-    sleep 5
-done > "$PANEL_FIFO" &
 
-#battery
-while true; do
+    # Battery
     lvl=$(cat /sys/class/power_supply/BAT0/capacity)
     stat=$(cat /sys/class/power_supply/BAT0/status)
     if [ $stat == "Charging" ]
@@ -46,12 +40,25 @@ while true; do
         icon='\uE19C'
     fi
 
-    echo -e 'E' $icon $lvl '%'
-    sleep 5
-done > "$PANEL_FIFO" &
+    echo -e 'E' $icon $lvl'%'
 
-#volume
-while true; do
+    # Networking
+    wired=$(ip route get 8.8.8.8 | grep -Po 'dev \K\w+' | grep -qFf - /proc/net/wireless)
+    if $wired; then
+        icon='\uE8C2'
+        ssid=''
+    else
+        icon='\uE63E'
+        ssid=$(iwgetid -r)
+    fi
+#    if ! $conn; then
+ #       icon='\uE1DA'
+  #  else
+  #      icon='\uE250'
+   # fi
+    echo -e 'F' $icon $ssid
+
+    # Volume
     vol=$(amixer get Master | grep % | sed -n 1p | awk -F '[' '{print $2}' | awk -F ']' '{print $1}' | sed s/%//) 
     if [ $vol = 0 ]; then
         icon='\uE04F'
@@ -64,19 +71,18 @@ while true; do
     fi
 
     echo -e 'G' $icon $vol'%'
-    sleep 5
+
+    sleep 1s
 done > "$PANEL_FIFO" &
 
 source ~/.config/panel/panel_config
 
 cat "$PANEL_FIFO" | ~/.config/panel/panel_functions | lemonbar\
     -g x$PANEL_HEIGHT\
-    -f "$PANEL_FONT_FAMILY"\
-    -f "$ICON_FONT"\
-    -f "$ICON_FONT2"\
-    -F "$COLOR_FOREGROUND"\
     -B "$COLOR_BACKGROUND"\
-    -u 2 | bash &
+    -F "$COLOR_FOREGROUND"\
+    -f "$PANEL_FONT_FAMILY"\
+    -f "$ICON_FONT" | bash &
 
 wait
 
