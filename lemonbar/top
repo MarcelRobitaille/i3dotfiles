@@ -1,0 +1,18 @@
+#!/bin/bash
+
+source ~/.config/lemonbar/setup
+
+while true; do
+    echo "%{U#000000}%{B$COLOR_HIGHLIGHT F$COLOR_TEXT_HIGHLIGHT}$(power)%{B- F-}$(player)%{c}$(music)%{r}$(volume)$(battery)$(network)%{B$COLOR_HIGHLIGHT F$COLOR_TEXT_HIGHLIGHT}$(clock)%{B- F-}"
+    sleep .1s
+done |
+
+lemonbar -p\
+    -g x$PANEL_HEIGHT\
+    -B "$COLOR_BACKGROUND"\
+    -F "$COLOR_FOREGROUND"\
+    -u 4\
+    -U "#000000"\
+    -f "$PANEL_FONT_FAMILY"\
+    -f "$ICON_FONT" | bash
+

@@ -1,0 +1,129 @@
+#!/bin/bash
+
+PANEL_FIFO=/tmp/panel-fifo
+PANEL_HEIGHT=28
+# PANEL_FONT_FAMILY="CamingoCode:size=9"
+PANEL_FONT_FAMILY="Source Code Pro:size=9"
+#ICON_FONT2="typicons:size=11"
+ICON_FONT="MaterialIcons:size=11"
+#COLOR_BACKGROUND="#BD2C40"
+COLOR_BACKGROUND="#BEC4C7"
+COLOR_FOREGROUND="#000000"
+COLOR_HIGHLIGHT="#000000"
+COLOR_TEXT_HIGHLIGHT="#FFFFFF"
+
+if [ $(pgrep -cx panel) -gt 1 ] ; then
+	printf "%s\n" "The panel is already running." >&2
+	exit 1
+fi
+
+trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
+
+
+# Power button
+power(){
+	echo -e '%{A:xterm -fa "Source Code Pro" -T floatme -e ~/power.sh -fs 12:}  \uE8AC  %{A}'
+}
+
+# Clock
+clock(){
+	echo -e ' \uE916' $(date +'%A, %b %e') '\uE924' $(date +'%l:%M:%S %p') ' '
+}
+
+# Battery
+battery(){
+	lvl=$(cat /sys/class/power_supply/BAT0/capacity)
+	stat=$(cat /sys/class/power_supply/BAT0/status)
+	if [ $stat == "Charging" ]
+	then
+		icon='\uE1A3'
+	elif (($lvl > 20))
+	then
+		icon='\uE1A4'
+	else
+		icon='\uE19C'
+	fi
+
+	echo -e $icon $lvl'%' ' '
+}
+
+# Networking
+network(){
+	wired=$(ip route get 8.8.8.8 | grep -Po 'dev \K\w+' | grep -qFf - /proc/net/wireless)
+	if $wired; then
+		icon='\uE8C2'
+		ssid=''
+	else
+		icon='\uE63E'
+		ssid=$(iwgetid -r)
+	fi
+#    if ! $conn; then
+ #       icon='\uE1DA'
+  #  else
+  #      icon='\uE250'
+   # fi
+	echo -e $icon $ssid ' '
+}
+
+# Volume
+volume(){
+	vol=$(amixer get Master | grep % | sed -n 1p | awk -F '[' '{print $2}' | awk -F ']' '{print $1}' | sed s/%//) 
+	if [ $vol = 0 ]; then
+		icon='\uE04F'
+	elif [ $vol -lt 33 ]; then
+		icon='\uE04E'
+	elif [ $vol -lt 66 ]; then
+		icon='\uE04D'
+	else
+		icon='\uE050'
+	fi
+
+	echo -e '%{A4:amixer -q set Master 5%+:}%{A5:amixer -q set Master 5%-:} ' $icon $vol'%' ' %{A}%{A}'
+}
+
+#Music
+music(){
+	song=$(mpc current)
+	echo -e '\uE405' $song
+}
+
+#Player
+player(){
+	status=$(mpc status | grep -E "(playing|paused)" -o)
+	progress=$(mpc status | grep -E "(playing|paused)" | rev | cut -c 3- | rev | cut -d "(" -f 2)
+	full=$((progress / 2))
+	shade=$((50 - full))
+	if [ $status == "playing" ]; then
+		icon='\uE034'
+	else
+		icon='\uE037'
+	fi
+	echo -e "%{A:mpc -q prev:} \uE045%{A}%{A:mpc -q toggle:} " $icon " %{A}%{A:mpc -q next:}\uE044 %{A} ▌"$(seq -s█ $full|tr -d '[:digit:]')$(seq -s▓ $shade|tr -d '[:digit:]')"▐"
+}
+
+# Workspace
+workspace() {
+	wslist=$(\
+		wmctrl -d \
+		| awk '/ / {print $2 $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20}' ORS=''\
+		| sed -e 's/\s*  //g' \
+		-e 's/\*[ 0-9A-Za-z]*[^ -~]*/\\uE3FA /g' \
+		-e 's/\-[ 0-9A-Za-z]*[^ -~]*/%{A:i3-msg workspace &:}\\uE836 %{A}/g' \
+		-e 's/\*//g' \
+		-e 's/ -/ /g' \
+	)
+
+	if (( $(wmctrl -d | wc -l) == 10)); then
+		new=""
+	else
+		new=$(\
+			wmctrl -d\
+			| rev\
+			| cut -c 1\
+			| awk -v RS='\\s+' '{ a[$1] } END { for(i = 1; i in a; ++i); print i }'\
+		)
+		new="%{A:i3-msg workspace $new:}\uE3BA%{A}"
+	fi
+
+	echo -n -e " $wslist$new"
+}

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+source ~/.config/lemonbar/setup
+
+while true; do
+    echo "$(workspace)"
+done |
+
+lemonbar -p\
+    -b\
+    -g "x25"\
+    -B "#1c1c1c"\
+    -F "#999999"\
+    -f "$PANEL_FONT_FAMILY"\
+    -f "$ICON_FONT" | bash
+
