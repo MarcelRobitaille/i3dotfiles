@@ -1,0 +1,59 @@
+#!/bin/bash
+
+source ~/.config/lemonbar/functions
+
+if [ $(pgrep -cx panel) -gt 1 ] ; then
+	printf "%s\n" "The panel is already running." >&2
+	exit 1
+fi
+
+trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
+
+[ -e "$PANEL_FIFO" ] && rm "$PANEL_FIFO"
+mkfifo "$PANEL_FIFO"
+
+# [ -e "$BOTTOM_FIFO" ] && rm "$BOTTOM_FIFO"
+# mkfifo "$BOTTOM_FIFO"
+
+# Power button
+echo -e 'P%{A:xterm -fa "Source Code Pro" -T floatme -e ~/power.sh -fs 12:}  \uE8AC  %{A}' > "$PANEL_FIFO" &
+
+while true; do
+	echo ""
+	sleep 1s
+done > "$PANEL_FIFO" &
+
+while true; do
+	clock
+	volume
+	music
+	player
+	workspace
+	sleep 1s
+done &
+
+while true; do
+	battery
+	sleep 10s
+done & 
+
+cat "$PANEL_FIFO" | ~/.config/lemonbar/top &
+
+wait
+
+# cat "$PANEL_FIFO" | ~/.config/lemonbar/top | lemonbar\
+# 	-g x$PANEL_HEIGHT\
+# 	-B "$COLOR_BACKGROUND"\
+# 	-F "$COLOR_FOREGROUND"\
+# 	-f "$PANEL_FONT_FAMILY"\
+# 	-f "$ICON_FONT" | bash &
+
+# cat "$PANEL_FIFO" | ~/.config/lemonbar/bottom | lemonbar\
+#     -b\
+#     -g "x25"\
+#     -B "#1c1c1c"\
+#     -F "#999999"\
+#     -f "$PANEL_FONT_FAMILY"\
+#     -f "$ICON_FONT" | bash &
+
+# wait

@@ -1,0 +1,8 @@
+COLOR_FOREGROUND='#000000'
+COLOR_BACKGROUND='#BEC4C7'
+COLOR_HIGHLIGHT='#000000'
+PANEL_FIFO=/tmp/panel-fifo
+PANEL_HEIGHT=28
+PANEL_FONT_FAMILY="Source Code Pro:size=9"
+ICON_FONT="MaterialIcons:size=11"
+UPDATE="~/.config/lemonbar/update"

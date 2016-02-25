@@ -1,8 +1,8 @@
 {
+	"font_face": "Source Code Pro",
 	"ignored_packages":
 	[
 		"Vintage"
 	],
-	"theme": "amCoder Classic.sublime-theme",
-	"font_face": "Source Code Pro"
+	"theme": "amCoder Classic.sublime-theme"
 }

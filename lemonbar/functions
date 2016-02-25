@@ -1,33 +1,15 @@
 #!/bin/bash
 
-PANEL_FIFO=/tmp/panel-fifo
-PANEL_HEIGHT=28
-# PANEL_FONT_FAMILY="CamingoCode:size=9"
-PANEL_FONT_FAMILY="Source Code Pro:size=9"
-#ICON_FONT2="typicons:size=11"
-ICON_FONT="MaterialIcons:size=11"
-#COLOR_BACKGROUND="#BD2C40"
-COLOR_BACKGROUND="#BEC4C7"
-COLOR_FOREGROUND="#000000"
-COLOR_HIGHLIGHT="#000000"
-COLOR_TEXT_HIGHLIGHT="#FFFFFF"
+source ~/.config/lemonbar/config
 
-if [ $(pgrep -cx panel) -gt 1 ] ; then
-	printf "%s\n" "The panel is already running." >&2
-	exit 1
-fi
-
-trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
-
-
-# Power button
+# Power
 power(){
-	echo -e '%{A:xterm -fa "Source Code Pro" -T floatme -e ~/power.sh -fs 12:}  \uE8AC  %{A}'
+	echo -e 'P%{A:xterm -fa "Source Code Pro" -T floatme -e ~/power.sh -fs 12:}  \uE8AC  %{A}' > "$PANEL_FIFO"
 }
 
 # Clock
 clock(){
-	echo -e ' \uE916' $(date +'%A, %b %e') '\uE924' $(date +'%l:%M:%S %p') ' '
+	echo -e 'C\uE916' $(date +'%A, %b %e') '\uE924' $(date +'%l:%M:%S %p') > "$PANEL_FIFO"
 }
 
 # Battery
@@ -44,11 +26,11 @@ battery(){
 		icon='\uE19C'
 	fi
 
-	echo -e $icon $lvl'%' ' '
+	echo -e 'E' $icon $lvl'%' > "$PANEL_FIFO"
 }
 
 # Networking
-network(){
+networking(){
 	wired=$(ip route get 8.8.8.8 | grep -Po 'dev \K\w+' | grep -qFf - /proc/net/wireless)
 	if $wired; then
 		icon='\uE8C2'
@@ -57,13 +39,9 @@ network(){
 		icon='\uE63E'
 		ssid=$(iwgetid -r)
 	fi
-#    if ! $conn; then
- #       icon='\uE1DA'
-  #  else
-  #      icon='\uE250'
-   # fi
-	echo -e $icon $ssid ' '
+	echo -e 'F' $icon $ssid > "$PANEL_FIFO"
 }
+
 
 # Volume
 volume(){
@@ -78,16 +56,16 @@ volume(){
 		icon='\uE050'
 	fi
 
-	echo -e '%{A4:amixer -q set Master 5%+:}%{A5:amixer -q set Master 5%-:} ' $icon $vol'%' ' %{A}%{A}'
+	echo -e 'G' $icon $vol'%' > "$PANEL_FIFO"
 }
 
-#Music
+# Music
 music(){
 	song=$(mpc current)
-	echo -e '\uE405' $song
+	echo -e 'M\uE405' $song > "$PANEL_FIFO"
 }
 
-#Player
+# Player
 player(){
 	status=$(mpc status | grep -E "(playing|paused)" -o)
 	progress=$(mpc status | grep -E "(playing|paused)" | rev | cut -c 3- | rev | cut -d "(" -f 2)
@@ -98,17 +76,17 @@ player(){
 	else
 		icon='\uE037'
 	fi
-	echo -e "%{A:mpc -q prev:} \uE045%{A}%{A:mpc -q toggle:} " $icon " %{A}%{A:mpc -q next:}\uE044 %{A} ▌"$(seq -s█ $full|tr -d '[:digit:]')$(seq -s▓ $shade|tr -d '[:digit:]')"▐"
+	echo -e "N%{A:mpc -q prev && ${UPDATE} player music:} \uE045%{A}%{A:mpc -q toggle && ${UPDATE} player:} " $icon " %{A}%{A:mpc -q next && ${UPDATE} player music:}\uE044 %{A} ▌"$(seq -s█ $full|tr -d '[:digit:]')$(seq -s▓ $shade|tr -d '[:digit:]')"▐" > "$PANEL_FIFO"
 }
 
-# Workspace
+# Workspaces
 workspace() {
 	wslist=$(\
 		wmctrl -d \
 		| awk '/ / {print $2 $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20}' ORS=''\
 		| sed -e 's/\s*  //g' \
 		-e 's/\*[ 0-9A-Za-z]*[^ -~]*/\\uE3FA /g' \
-		-e 's/\-[ 0-9A-Za-z]*[^ -~]*/%{A:i3-msg workspace &:}\\uE836 %{A}/g' \
+		-e 's/\-[ 0-9A-Za-z]*[^ -~]*/%{A:i3-msg workspace & \&\& \~\/.config\/lemonbar\/update workspace:}\\uE836 %{A}/g' \
 		-e 's/\*//g' \
 		-e 's/ -/ /g' \
 	)
@@ -122,8 +100,8 @@ workspace() {
 			| cut -c 1\
 			| awk -v RS='\\s+' '{ a[$1] } END { for(i = 1; i in a; ++i); print i }'\
 		)
-		new="%{A:i3-msg workspace $new:}\uE3BA%{A}"
+		new="%{A:i3-msg -q workspace $new && ${UPDATE} workspace:}\uE3BA%{A}"
 	fi
 
-	echo -n -e " $wslist$new"
+	echo -e "A$wslist$new" > "$PANEL_FIFO"
 }

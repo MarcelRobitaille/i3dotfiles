@@ -1,16 +1,19 @@
 #!/bin/bash
 
-source ~/.config/lemonbar/setup
+source ~/.config/lemonbar/config
 
-while true; do
-    echo "$(workspace)"
-done |
-
-lemonbar -p\
+cat "$PANEL_FIFO" | while read -r line ; do
+	case $line in
+		A*)
+			# Workspaces
+			workspace="${line#?}"
+			;;
+	esac
+	printf "%s\n" "${workspace}"
+done | lemonbar\
     -b\
     -g "x25"\
     -B "#1c1c1c"\
     -F "#999999"\
     -f "$PANEL_FONT_FAMILY"\
-    -f "$ICON_FONT" | bash
-
+    -f "$ICON_FONT" | bash &

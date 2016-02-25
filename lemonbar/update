@@ -1,0 +1,12 @@
+#!/bin/bash
+
+source ~/.config/lemonbar/functions
+
+functions=("volume" "music" "player" "workspace");
+
+while [ "$1" != "" ]; do
+	if [[ " ${functions[@]} " =~ " ${1} " ]]; then
+		eval "$1"
+	fi
+	shift;
+done;
