@@ -8,3 +8,5 @@ Here are the dotfiles for my Arch Linux installation
 ![Screenfetch Screenshot](http://i.imgur.com/VVR1de3.png "Screenfetch Screenshot")
 ######Fake Busy
 ![Fake Busy Screenshot](http://i.imgur.com/8szR3Mn.png "Fake Busy Screenshot")
+######OBLogout
+!['OBLogout Screenshot'](http://i.imgur.com/1DoSlZk.png "OBLogout Screenshot")
