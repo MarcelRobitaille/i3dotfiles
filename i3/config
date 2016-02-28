@@ -178,9 +178,10 @@ new_window none
 smart_gaps on
 gaps inner 10
 
-floating_maximum_size 650 x 200
+floating_maximum_size 1000 x 200
 
 for_window [title="^floatme$"] floating enable
+for_window [title="Openbox Logout"] floating enable
 
 # Multimedia keys
 bindsym XF86AudioRaiseVolume exec amixer -q set Master 5%+ unmute

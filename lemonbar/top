@@ -2,9 +2,12 @@
 
 source ~/.config/lemonbar/setup
 
+echo $$ > pid
+
 while true; do
+	# echo $! > pid
     echo "%{U#000000}%{B$COLOR_HIGHLIGHT F$COLOR_TEXT_HIGHLIGHT}$(power)%{B- F-}$(player)%{c}$(music)%{r}$(volume)$(battery)$(network)%{B$COLOR_HIGHLIGHT F$COLOR_TEXT_HIGHLIGHT}$(clock)%{B- F-}"
-    sleep .1s
+    sleep 5s
 done |
 
 lemonbar -p\

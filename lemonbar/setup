@@ -11,6 +11,7 @@ COLOR_BACKGROUND="#BEC4C7"
 COLOR_FOREGROUND="#000000"
 COLOR_HIGHLIGHT="#000000"
 COLOR_TEXT_HIGHLIGHT="#FFFFFF"
+UPDATE="~/.config/lemonbar/update"
 
 if [ $(pgrep -cx panel) -gt 1 ] ; then
 	printf "%s\n" "The panel is already running." >&2
@@ -22,7 +23,7 @@ trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
 
 # Power button
 power(){
-	echo -e '%{A:xterm -fa "Source Code Pro" -T floatme -e ~/power.sh -fs 12:}  \uE8AC  %{A}'
+	echo -e '%{A:oblogout:}  \uE8AC  %{A}'
 }
 
 # Clock
@@ -57,11 +58,6 @@ network(){
 		icon='\uE63E'
 		ssid=$(iwgetid -r)
 	fi
-#    if ! $conn; then
- #       icon='\uE1DA'
-  #  else
-  #      icon='\uE250'
-   # fi
 	echo -e $icon $ssid ' '
 }
 
@@ -78,7 +74,7 @@ volume(){
 		icon='\uE050'
 	fi
 
-	echo -e '%{A4:amixer -q set Master 5%+:}%{A5:amixer -q set Master 5%-:} ' $icon $vol'%' ' %{A}%{A}'
+	echo -e "%{A4:amixer -q set Master 5%+ && ${UPDATE}:}%{A5:amixer -q set Master 5%- && ${UPDATE}:} " $icon $vol'%' ' %{A}%{A}'
 }
 
 #Music
@@ -108,7 +104,7 @@ workspace() {
 		| awk '/ / {print $2 $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20}' ORS=''\
 		| sed -e 's/\s*  //g' \
 		-e 's/\*[ 0-9A-Za-z]*[^ -~]*/\\uE3FA /g' \
-		-e 's/\-[ 0-9A-Za-z]*[^ -~]*/%{A:i3-msg workspace &:}\\uE836 %{A}/g' \
+		-e 's/\-[ 0-9A-Za-z]*[^ -~]*/%{A:i3-msg workspace & \&\& \~\/.config\/lemonbar\/update:}\\uE836 %{A}/g' \
 		-e 's/\*//g' \
 		-e 's/ -/ /g' \
 	)
@@ -122,8 +118,13 @@ workspace() {
 			| cut -c 1\
 			| awk -v RS='\\s+' '{ a[$1] } END { for(i = 1; i in a; ++i); print i }'\
 		)
-		new="%{A:i3-msg workspace $new:}\uE3BA%{A}"
+		new="%{A:i3-msg workspace $new && ${UPDATE}:}\uE3BA%{A}"
 	fi
 
 	echo -n -e " $wslist$new"
+}
+
+title(){
+	title=$(xdotool getactivewindow getwindowname)
+	echo "$title" | cut -c 1-70
 }
