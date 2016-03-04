@@ -1,5 +1,6 @@
 [options]
 font = Source Code Pro 11
+cursor_shape = ibeam
 
 [colors]
 background = rgba(0, 0, 0, 0.7)
