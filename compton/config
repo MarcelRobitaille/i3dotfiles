@@ -1,0 +1,24 @@
+#########
+#Opacity#
+#########
+
+menu-opacity = 1;
+#active-opacity = 0.5;
+frame-opacity = 1;
+
+##########
+# Windows#
+##########
+
+wintypes: {
+    tooltip = {
+        fade = true;
+        shadow = false;
+        opacity = 1;
+        focus = true;
+    };
+
+    dock = {
+        opacity = 1;
+    };
+};
