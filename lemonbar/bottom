@@ -4,7 +4,7 @@ source ~/.config/lemonbar/setup
 
 while true; do
 	echo "$(workspace)%{c}$(title)"
-	sleep 5s
+	sleep 10s
 done |
 
 lemonbar -p\
