@@ -5,11 +5,13 @@ Here are the dotfiles for my Arch Linux installation
 ######Clean
 ![Clean Screenshot](http://i.imgur.com/sKPvCfK.png "Clean Screenshot")
 ######Fake Busy
-![Fake Busy Screenshot](http://i.imgur.com/TWlhL3e.png "Fake Busy Screenshot")
+![Fake Busy Screenshot](http://i.imgur.com/NN2WJQG.png "Fake Busy Screenshot")
 ######Neofetch
-![Neofetch Screenshot](http://i.imgur.com/84L86a8.png "Neofetch Screenshot")
+![Neofetch Screenshot](http://i.imgur.com/z3cSYe9.png "Neofetch Screenshot")
+######Sublime Text 3
+![Sublime Text Screenshot](http://i.imgur.com/TxDV9Vx.png "Sublime Text Screenshot")
 ######ncmpcpp
-![ncmpcpp Screenshot](http://i.imgur.com/1bOHBgU.png "ncmpcpp Screenshot")
+![ncmpcpp Screenshot](http://i.imgur.com/CuMab7g.png "ncmpcpp Screenshot")
 ######OBLogout
 !['OBLogout Screenshot'](http://i.imgur.com/JtWKpic.png "OBLogout Screenshot")
 ######Wallpaper
