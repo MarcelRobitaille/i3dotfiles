@@ -95,7 +95,7 @@ player(){
 	else
 		icon='\uE037'
 	fi
-	echo -e "%{A:mpc -q prev:} \uE045%{A}%{A:mpc -q toggle:} " $icon " %{A}%{A:mpc -q next:}\uE044 %{A} ▌"$(seq -s█ $full|tr -d '[:digit:]')$(seq -s▓ $shade|tr -d '[:digit:]')"▐"
+	echo -e "%{A:mpc -q prev && ${UPDATE}:} \uE045%{A}%{A:mpc -q toggle && ${UPDATE}:} " $icon " %{A}%{A:mpc -q next && ${UPDATE}:}\uE044 %{A} ▌"$(seq -s█ $full|tr -d '[:digit:]')$(seq -s▓ $shade|tr -d '[:digit:]')"▐"
 }
 
 # Workspace
